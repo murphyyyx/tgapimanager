@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -55,6 +56,155 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 	bot.Self = self
 
 	return bot, nil
+}
+
+func hasFilesNeedingUpload(files []RequestFile) bool {
+	for _, file := range files {
+		if file.Data.NeedsUpload() {
+			return true
+		}
+	}
+
+	return false
+}
+
+// UploadFiles makes a request to the API with files.
+func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
+	r, w := io.Pipe()
+	m := multipart.NewWriter(w)
+
+	// This code modified from the very helpful @HirbodBehnam
+	// https://github.com/go-telegram-bot-api/telegram-bot-api/issues/354#issuecomment-663856473
+	go func() {
+		defer w.Close()
+		defer m.Close()
+
+		for field, value := range params {
+			if err := m.WriteField(field, value); err != nil {
+				w.CloseWithError(err)
+				return
+			}
+		}
+
+		for _, file := range files {
+			if file.Data.NeedsUpload() {
+				name, reader, err := file.Data.UploadData()
+				if err != nil {
+					w.CloseWithError(err)
+					return
+				}
+
+				part, err := m.CreateFormFile(file.Name, name)
+				if err != nil {
+					w.CloseWithError(err)
+					return
+				}
+
+				if _, err := io.Copy(part, reader); err != nil {
+					w.CloseWithError(err)
+					return
+				}
+
+				if closer, ok := reader.(io.ReadCloser); ok {
+					if err = closer.Close(); err != nil {
+						w.CloseWithError(err)
+						return
+					}
+				}
+			} else {
+				value := file.Data.SendData()
+
+				if err := m.WriteField(file.Name, value); err != nil {
+					w.CloseWithError(err)
+					return
+				}
+			}
+		}
+	}()
+
+	if bot.Debug {
+		log.Printf("Endpoint: %s, params: %v, with %d files\n", endpoint, params, len(files))
+	}
+
+	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
+
+	req, err := http.NewRequest("POST", method, r)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", m.FormDataContentType())
+
+	resp, err := bot.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var apiResp APIResponse
+	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
+	if err != nil {
+		return &apiResp, err
+	}
+
+	if bot.Debug {
+		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
+	}
+
+	if !apiResp.Ok {
+		var parameters ResponseParameters
+
+		if apiResp.Parameters != nil {
+			parameters = *apiResp.Parameters
+		}
+
+		return &apiResp, &Error{
+			Message:            apiResp.Description,
+			ResponseParameters: parameters,
+		}
+	}
+
+	return &apiResp, nil
+}
+
+// Request sends a Chattable to Telegram, and returns the APIResponse.
+func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
+	params, err := c.params()
+	if err != nil {
+		return nil, err
+	}
+
+	if t, ok := c.(Fileable); ok {
+		files := t.files()
+
+		// If we have files that need to be uploaded, we should delegate the
+		// request to UploadFile.
+		if hasFilesNeedingUpload(files) {
+			return bot.UploadFiles(t.method(), params, files)
+		}
+
+		// However, if there are no files to be uploaded, there's likely things
+		// that need to be turned into params instead.
+		for _, file := range files {
+			params[file.Name] = file.Data.SendData()
+		}
+	}
+
+	return bot.MakeRequest(c.method(), params)
+}
+
+// Send will send a Chattable item to Telegram and provides the
+// returned Message.
+func (bot *BotAPI) Send(c Chattable) (Message, error) {
+	resp, err := bot.Request(c)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	err = json.Unmarshal(resp.Result, &message)
+
+	return message, err
 }
 
 func buildParams(in Params) url.Values {
