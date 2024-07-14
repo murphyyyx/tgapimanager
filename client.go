@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-
-	"github.com/murphyyyx/tgAPImanager/wraperr"
 )
 
 const (
@@ -60,14 +58,14 @@ func (c *Client) SendMessage(chatID int, text string) error {
 
 	_, err := c.doRequest(sendMessageMethod, q)
 	if err != nil {
-		return wraperr.Wrap("can't send a message", err)
+		return Wrap("can't send a message", err)
 	}
 
 	return nil
 }
 
 func (c *Client) doRequest(method string, query url.Values) (data []byte, err error) {
-	defer func() { err = wraperr.WrapIfError("can't do a request", err) }()
+	defer func() { err = WrapIfError("can't do a request", err) }()
 
 	u := url.URL{
 		Scheme: "https",

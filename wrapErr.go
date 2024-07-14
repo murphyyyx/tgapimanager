@@ -1,4 +1,4 @@
-package wraperr
+package tgapimanager
 
 import "fmt"
 
