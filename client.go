@@ -1,4 +1,4 @@
-package tgapilib
+package tgapimanager
 
 import (
 	"encoding/json"

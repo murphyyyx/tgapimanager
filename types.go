@@ -1,4 +1,4 @@
-package tgapilib
+package tgapimanager
 
 type UpdatesResponse struct {
 	Ok     bool     `json:"ok"`
