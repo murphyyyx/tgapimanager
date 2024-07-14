@@ -8,7 +8,7 @@ import (
 	"path"
 	"strconv"
 
-	wraperr "github.com/murphyyyx/tgAPImanager/wrapErr"
+	"github.com/murphyyyx/tgAPImanager/wraperr"
 )
 
 const (
