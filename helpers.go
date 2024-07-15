@@ -21,3 +21,22 @@ func NewUpdate(offset int) UpdateConfig {
 		Timeout: 0,
 	}
 }
+
+// NewReplyKeyboard creates a new regular keyboard with sane defaults.
+func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
+	var keyboard [][]KeyboardButton
+
+	keyboard = append(keyboard, rows...)
+
+	return ReplyKeyboardMarkup{
+		ResizeKeyboard: true,
+		Keyboard:       keyboard,
+	}
+}
+
+// NewKeyboardButton creates a regular keyboard button.
+func NewKeyboardButton(text string) KeyboardButton {
+	return KeyboardButton{
+		Text: text,
+	}
+}
