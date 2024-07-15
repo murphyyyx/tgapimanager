@@ -59,3 +59,26 @@ type RequestFileData interface {
 	// must only be called when the file does not need to be uploaded.
 	SendData() string
 }
+
+// UpdateConfig contains information about a GetUpdates request.
+type UpdateConfig struct {
+	Offset         int
+	Limit          int
+	Timeout        int
+	AllowedUpdates []string
+}
+
+func (UpdateConfig) method() string {
+	return "getUpdates"
+}
+
+func (config UpdateConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonZero("offset", config.Offset)
+	params.AddNonZero("limit", config.Limit)
+	params.AddNonZero("timeout", config.Timeout)
+	params.AddInterface("allowed_updates", config.AllowedUpdates)
+
+	return params, nil
+}

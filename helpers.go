@@ -13,3 +13,11 @@ func NewMessage(chatID int64, text string) MessageConfig {
 		DisableWebPagePreview: false,
 	}
 }
+
+func NewUpdate(offset int) UpdateConfig {
+	return UpdateConfig{
+		Offset:  offset,
+		Limit:   0,
+		Timeout: 0,
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 // HTTPClient is the type needed for the bot to perform HTTP requests.
@@ -191,6 +192,52 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 	}
 
 	return bot.MakeRequest(c.method(), params)
+}
+
+func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
+	resp, err := bot.Request(config)
+	if err != nil {
+		return []Update{}, err
+	}
+
+	var updates []Update
+	err = json.Unmarshal(resp.Result, &updates)
+
+	return updates, err
+}
+
+// GetUpdatesChan starts and returns a channel for getting updates.
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
+	ch := make(chan Update, bot.Buffer)
+
+	go func() {
+		for {
+			select {
+			case <-bot.shutdownChannel:
+				close(ch)
+				return
+			default:
+			}
+
+			updates, err := bot.GetUpdates(config)
+			if err != nil {
+				log.Println(err)
+				log.Println("Failed to get updates, retrying in 3 seconds...")
+				time.Sleep(time.Second * 3)
+
+				continue
+			}
+
+			for _, update := range updates {
+				if update.UpdateID >= config.Offset {
+					config.Offset = update.UpdateID + 1
+					ch <- update
+				}
+			}
+		}
+	}()
+
+	return ch
 }
 
 // Send will send a Chattable item to Telegram and provides the
