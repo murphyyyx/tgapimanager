@@ -1,3 +1,3 @@
-module github.com/murphyyyx/tgAPImanager
+module github.com/murphyyyx/tgapimanager
 
 go 1.22.5
