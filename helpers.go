@@ -40,3 +40,12 @@ func NewKeyboardButton(text string) KeyboardButton {
 		Text: text,
 	}
 }
+
+// NewKeyboardButtonRow creates a row of keyboard buttons.
+func NewKeyboardButtonRow(buttons ...KeyboardButton) []KeyboardButton {
+	var row []KeyboardButton
+
+	row = append(row, buttons...)
+
+	return row
+}
