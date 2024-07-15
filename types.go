@@ -11,8 +11,8 @@ type UpdatesResponse struct {
 }
 
 type Update struct {
-	UpdateID int    `json:"update_id"`
-	Message  string `json:"message"`
+	UpdateID int      `json:"update_id"`
+	Message  *Message `json:"message,omitempty"`
 }
 
 type User struct {
