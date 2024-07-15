@@ -27,6 +27,37 @@ type MessageConfig struct {
 	DisableWebPagePreview bool
 }
 
+func (chat *BaseChat) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
+	params.AddBool("disable_notification", chat.DisableNotification)
+	params.AddBool("allow_sending_without_reply", chat.AllowSendingWithoutReply)
+
+	err := params.AddInterface("reply_markup", chat.ReplyMarkup)
+
+	return params, err
+}
+
+func (config MessageConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params.AddNonEmpty("text", config.Text)
+	params.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+	err = params.AddInterface("entities", config.Entities)
+
+	return params, err
+}
+
+func (config MessageConfig) method() string {
+	return "sendMessage"
+}
+
 // Chattable is any config type that can be sent.
 type Chattable interface {
 	params() (Params, error)
