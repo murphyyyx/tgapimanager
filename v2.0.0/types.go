@@ -371,3 +371,32 @@ type ReplyKeyboardMarkup struct {
 	// optional
 	Selective bool `json:"selective,omitempty"`
 }
+
+// ChatLocation represents a location to which a chat is connected.
+type ChatLocation struct {
+	// Location is the location to which the supergroup is connected. Can't be a
+	// live location.
+	Location Location `json:"location"`
+	// Address is the location address; 1-64 characters, as defined by the chat
+	// owner
+	Address string `json:"address"`
+}
+
+// BotCommand represents a bot command.
+type BotCommand struct {
+	// Command text of the command, 1-32 characters.
+	// Can contain only lowercase English letters, digits and underscores.
+	Command string `json:"command"`
+	// Description of the command, 3-256 characters.
+	Description string `json:"description"`
+}
+
+// BotCommandScope represents the scope to which bot commands are applied.
+//
+// It contains the fields for all types of scopes, different types only support
+// specific (or no) fields.
+type BotCommandScope struct {
+	Type   string `json:"type"`
+	ChatID int64  `json:"chat_id,omitempty"`
+	UserID int64  `json:"user_id,omitempty"`
+}
