@@ -34,6 +34,14 @@ func NewBotAPI(token string) (*BotAPI, error) {
 	return NewBotAPIWithClient(token, APIEndpoint, &http.Client{})
 }
 
+// NewBotAPIWithAPIEndpoint creates a new BotAPI instance
+// and allows you to pass API endpoint.
+//
+// It requires a token, provided by @BotFather on Telegram and API endpoint.
+func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
+	return NewBotAPIWithClient(token, apiEndpoint, &http.Client{})
+}
+
 // NewBotAPIWithClient creates a new BotAPI instance
 // and allows you to pass a http.Client.
 //
@@ -56,6 +64,11 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 	bot.Self = self
 
 	return bot, nil
+}
+
+// SetAPIEndpoint changes the Telegram Bot API endpoint used by the instance.
+func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
+	bot.apiEndpoint = apiEndpoint
 }
 
 func hasFilesNeedingUpload(files []RequestFile) bool {
