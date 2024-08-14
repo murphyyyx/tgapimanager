@@ -49,3 +49,36 @@ func NewKeyboardButtonRow(buttons ...KeyboardButton) []KeyboardButton {
 
 	return row
 }
+
+// NewSetMyCommands allows you to set the registered commands.
+func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{Commands: commands}
+}
+
+// NewSetMyCommandsWithScope allows you to set the registered commands for a given scope.
+func NewSetMyCommandsWithScope(scope BotCommandScope, commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{Commands: commands, Scope: &scope}
+}
+
+// NewSetMyCommandsWithScopeAndLanguage allows you to set the registered commands for a given scope
+// and language code.
+func NewSetMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string, commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{Commands: commands, Scope: &scope, LanguageCode: languageCode}
+}
+
+// NewDeleteMyCommands allows you to delete the registered commands.
+func NewDeleteMyCommands() DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{}
+}
+
+// NewDeleteMyCommandsWithScope allows you to delete the registered commands for a given
+// scope.
+func NewDeleteMyCommandsWithScope(scope BotCommandScope) DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{Scope: &scope}
+}
+
+// NewDeleteMyCommandsWithScopeAndLanguage allows you to delete the registered commands for a given
+// scope and language code.
+func NewDeleteMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string) DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{Scope: &scope, LanguageCode: languageCode}
+}
