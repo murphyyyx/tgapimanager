@@ -113,3 +113,44 @@ func (config UpdateConfig) params() (Params, error) {
 
 	return params, nil
 }
+
+// SetMyCommandsConfig sets a list of commands the bot understands.
+type SetMyCommandsConfig struct {
+	Commands     []BotCommand
+	Scope        *BotCommandScope
+	LanguageCode string
+}
+
+func (config SetMyCommandsConfig) method() string {
+	return "setMyCommands"
+}
+
+func (config SetMyCommandsConfig) params() (Params, error) {
+	params := make(Params)
+
+	if err := params.AddInterface("commands", config.Commands); err != nil {
+		return params, err
+	}
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, err
+}
+
+type DeleteMyCommandsConfig struct {
+	Scope        *BotCommandScope
+	LanguageCode string
+}
+
+func (config DeleteMyCommandsConfig) method() string {
+	return "deleteMyCommands"
+}
+
+func (config DeleteMyCommandsConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, err
+}

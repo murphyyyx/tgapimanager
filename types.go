@@ -298,6 +298,43 @@ type Location struct {
 	ProximityAlertRadius int `json:"proximity_alert_radius,omitempty"`
 }
 
+// Venue represents a venue.
+type Venue struct {
+	// Location is the venue location
+	Location Location `json:"location"`
+	// Title is the name of the venue
+	Title string `json:"title"`
+	// Address of the venue
+	Address string `json:"address"`
+	// FoursquareID is the foursquare identifier of the venue
+	//
+	// optional
+	FoursquareID string `json:"foursquare_id,omitempty"`
+	// FoursquareType is the foursquare type of the venue
+	//
+	// optional
+	FoursquareType string `json:"foursquare_type,omitempty"`
+	// GooglePlaceID is the Google Places identifier of the venue
+	//
+	// optional
+	GooglePlaceID string `json:"google_place_id,omitempty"`
+	// GooglePlaceType is the Google Places type of the venue
+	//
+	// optional
+	GooglePlaceType string `json:"google_place_type,omitempty"`
+}
+
+// ProximityAlertTriggered represents a service message sent when a user in the
+// chat triggers a proximity alert sent by another user.
+type ProximityAlertTriggered struct {
+	// Traveler is the user that triggered the alert
+	Traveler User `json:"traveler"`
+	// Watcher is the user that set the alert
+	Watcher User `json:"watcher"`
+	// Distance is the distance between the users
+	Distance int `json:"distance"`
+}
+
 // Time converts the message timestamp into a Time.
 func (m *Message) Time() time.Time {
 	return time.Unix(int64(m.Date), 0)
