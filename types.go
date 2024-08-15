@@ -437,3 +437,142 @@ type BotCommandScope struct {
 	ChatID int64  `json:"chat_id,omitempty"`
 	UserID int64  `json:"user_id,omitempty"`
 }
+
+// WebhookInfo is information about a currently set webhook.
+type WebhookInfo struct {
+	// URL webhook URL, may be empty if webhook is not set up.
+	URL string `json:"url"`
+	// HasCustomCertificate true, if a custom certificate was provided for webhook certificate checks.
+	HasCustomCertificate bool `json:"has_custom_certificate"`
+	// PendingUpdateCount number of updates awaiting delivery.
+	PendingUpdateCount int `json:"pending_update_count"`
+	// IPAddress is the currently used webhook IP address
+	//
+	// optional
+	IPAddress string `json:"ip_address,omitempty"`
+	// LastErrorDate unix time for the most recent error
+	// that happened when trying to deliver an update via webhook.
+	//
+	// optional
+	LastErrorDate int `json:"last_error_date,omitempty"`
+	// LastErrorMessage error message in human-readable format for the most recent error
+	// that happened when trying to deliver an update via webhook.
+	//
+	// optional
+	LastErrorMessage string `json:"last_error_message,omitempty"`
+	// MaxConnections maximum allowed number of simultaneous
+	// HTTPS connections to the webhook for update delivery.
+	//
+	// optional
+	MaxConnections int `json:"max_connections,omitempty"`
+	// AllowedUpdates is a list of update types the bot is subscribed to.
+	// Defaults to all update types
+	//
+	// optional
+	AllowedUpdates []string `json:"allowed_updates,omitempty"`
+}
+
+// IsSet returns true if a webhook is currently set.
+func (info WebhookInfo) IsSet() bool {
+	return info.URL != ""
+}
+
+// the message it belongs to.
+type InlineKeyboardMarkup struct {
+	// InlineKeyboard array of button rows, each represented by an Array of
+	// InlineKeyboardButton objects
+	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+}
+
+// InlineKeyboardButton represents one button of an inline keyboard. You must
+// use exactly one of the optional fields.
+//
+// Note that some values are references as even an empty string
+// will change behavior.
+//
+// CallbackGame, if set, MUST be first button in first row.
+type InlineKeyboardButton struct {
+	// Text label text on the button
+	Text string `json:"text"`
+	// URL HTTP or tg:// url to be opened when button is pressed.
+	//
+	// optional
+	URL *string `json:"url,omitempty"`
+	// LoginURL is an HTTP URL used to automatically authorize the user. Can be
+	// used as a replacement for the Telegram Login Widget
+	//
+	// optional
+	LoginURL *LoginURL `json:"login_url,omitempty"`
+	// CallbackData data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
+	//
+	// optional
+	CallbackData *string `json:"callback_data,omitempty"`
+	// SwitchInlineQuery if set, pressing the button will prompt the user to select one of their chats,
+	// open that chat and insert the bot's username and the specified inline query in the input field.
+	// Can be empty, in which case just the bot's username will be inserted.
+	//
+	// This offers an easy way for users to start using your bot
+	// in inline mode when they are currently in a private chat with it.
+	// Especially useful when combined with switch_pm… actions – in this case
+	// the user will be automatically returned to the chat they switched from,
+	// skipping the chat selection screen.
+	//
+	// optional
+	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"`
+	// SwitchInlineQueryCurrentChat if set, pressing the button will insert the bot's username
+	// and the specified inline query in the current chat's input field.
+	// Can be empty, in which case only the bot's username will be inserted.
+	//
+	// This offers a quick way for the user to open your bot in inline mode
+	// in the same chat – good for selecting something from multiple options.
+	//
+	// optional
+	SwitchInlineQueryCurrentChat *string `json:"switch_inline_query_current_chat,omitempty"`
+	// CallbackGame description of the game that will be launched when the user presses the button.
+	//
+	// optional
+	CallbackGame *CallbackGame `json:"callback_game,omitempty"`
+	// Pay specify True, to send a Pay button.
+	//
+	// NOTE: This type of button must always be the first button in the first row.
+	//
+	// optional
+	Pay bool `json:"pay,omitempty"`
+}
+
+// CallbackGame is for starting a game in an inline keyboard button.
+type CallbackGame struct{}
+
+// LoginURL represents a parameter of the inline keyboard button used to
+// automatically authorize a user. Serves as a great replacement for the
+// Telegram Login Widget when the user is coming from Telegram. All the user
+// needs to do is tap/click a button and confirm that they want to log in.
+type LoginURL struct {
+	// URL is an HTTP URL to be opened with user authorization data added to the
+	// query string when the button is pressed. If the user refuses to provide
+	// authorization data, the original URL without information about the user
+	// will be opened. The data added is the same as described in Receiving
+	// authorization data.
+	//
+	// NOTE: You must always check the hash of the received data to verify the
+	// authentication and the integrity of the data as described in Checking
+	// authorization.
+	URL string `json:"url"`
+	// ForwardText is the new text of the button in forwarded messages
+	//
+	// optional
+	ForwardText string `json:"forward_text,omitempty"`
+	// BotUsername is the username of a bot, which will be used for user
+	// authorization. See Setting up a bot for more details. If not specified,
+	// the current bot's username will be assumed. The url's domain must be the
+	// same as the domain linked with the bot. See Linking your domain to the
+	// bot for more details.
+	//
+	// optional
+	BotUsername string `json:"bot_username,omitempty"`
+	// RequestWriteAccess if true requests permission for your bot to send
+	// messages to the user
+	//
+	// optional
+	RequestWriteAccess bool `json:"request_write_access,omitempty"`
+}

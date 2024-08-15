@@ -154,3 +154,59 @@ func (config DeleteMyCommandsConfig) params() (Params, error) {
 
 	return params, err
 }
+
+// GetMyCommandsConfig gets a list of the currently registered commands.
+type GetMyCommandsConfig struct {
+	Scope        *BotCommandScope
+	LanguageCode string
+}
+
+func (config GetMyCommandsConfig) method() string {
+	return "getMyCommands"
+}
+
+func (config GetMyCommandsConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, err
+}
+
+// BaseEdit is base type of all chat edits.
+type BaseEdit struct {
+	ChatID          int64
+	ChannelUsername string
+	MessageID       int
+	InlineMessageID string
+	ReplyMarkup     *InlineKeyboardMarkup
+}
+
+func (edit BaseEdit) params() (Params, error) {
+	params := make(Params)
+
+	if edit.InlineMessageID != "" {
+		params["inline_message_id"] = edit.InlineMessageID
+	} else {
+		params.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
+		params.AddNonZero("message_id", edit.MessageID)
+	}
+
+	err := params.AddInterface("reply_markup", edit.ReplyMarkup)
+
+	return params, err
+}
+
+// StopPollConfig allows you to stop a poll sent by the bot.
+type StopPollConfig struct {
+	BaseEdit
+}
+
+func (config StopPollConfig) params() (Params, error) {
+	return config.BaseEdit.params()
+}
+
+func (StopPollConfig) method() string {
+	return "stopPoll"
+}
