@@ -76,7 +76,7 @@ func (u *User) String() string {
 }
 
 type Chat struct {
-	ID int `json:"id"`
+	ID int64 `json:"id"`
 }
 
 // ResponseParameters are various errors that can be returned in APIResponse.
